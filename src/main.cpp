@@ -27,7 +27,7 @@ struct App {
     SDL_Window *mGraphicsApplicationWindow = nullptr;
     SDL_GLContext mOpenGLContext = nullptr;
     // Main loop flag
-    // If this quit = "true", then the program ends.
+    // If this mQuit = "true", then the program ends.
     bool mQuit = false; 
 
     // Shader
@@ -150,19 +150,21 @@ void meshCreate(Mesh3D *mesh)
     //       which follow in this function. It is not necessary, but it makes
     //       the code cleaner if GPU-related functions are packed closer
     //       together versus CPU operations.
+    
+    // original vertices
     const std::vector<GLfloat> vertexData{
         // 0 - vertex
-       -0.5f, -0.5f, 0.0f, // left vertex position
-       1.0f, 0.0f, 0.0f, // left vertex color
+       -0.5f, -0.5f, 0.0f, // bottom-left vertex position
+       1.0f, 0.0f, 0.0f, // bottom-left vertex color
        // 1 - vertex
-        0.5f, -0.5f, 0.0f, // right vertex position
-        0.0f, 1.0f, 0.0f, // right vertex color
+        0.5f, -0.5f, 0.0f, // bottom-right vertex position
+        0.0f, 1.0f, 0.0f, // bottom-right vertex color
         // 2 - vertex
-        -0.5f, 0.5, 0.0f,   // top vertex position
-        0.0f, 0.0f, 1.0f, // top vertex color
+        -0.5f, 0.5, 0.0f,   // top-left vertex position
+        0.0f, 0.0f, 1.0f, // top-left vertex color
         // 3 - vertex                   
-        0.5f, 0.5f, 0.0f, // top vertex position
-        0.0f, 0.0f, 1.0f, // right vertex color
+        0.5f, 0.5f, 0.0f, // top-right vertex position
+        0.0f, 0.0f, 1.0f, // top-right vertex color
 
    };
 
@@ -197,11 +199,26 @@ void meshCreate(Mesh3D *mesh)
                 GL_STATIC_DRAW); // how we intend to use the data
             
 
-    const std::vector<GLuint> indexBufferData{2, 0, 1, 3, 2, 1};
+    const std::vector<GLuint> indexBufferData{
+                                                0, 1, 2,
+                                                1, 3, 4,
+                                                5, 6, 3,
+                                                7, 3, 6,
+                                                2, 4, 7,
+                                                0, 7, 6,
+                                                0, 5, 1,
+                                                1, 5, 3,
+                                                5, 0, 6,
+                                                7, 4, 3,
+                                                2, 1, 4,
+                                                0, 2, 7
+    };
+
     // setup the index buffer
     glGenBuffers(1, &mesh->mIndexBufferObject);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,
                 mesh->mIndexBufferObject);
+
     // populate our index buffer
     glBufferData(GL_ELEMENT_ARRAY_BUFFER,
                 indexBufferData.size() * sizeof(GLuint),
@@ -209,8 +226,7 @@ void meshCreate(Mesh3D *mesh)
                 GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
-
-    // the 3 is for the x, y, z
+    // link up the vertice's locations in our VBO, the 3 is for the x, y, z
     glVertexAttribPointer(0,
                           3,    // the number of components
                           GL_FLOAT, // type
@@ -219,6 +235,7 @@ void meshCreate(Mesh3D *mesh)
                           (void *)0 // offset, in reference to the start of the vector
                           ); 
            
+    glEnableVertexAttribArray(1);
     // now linking up the color attributes in our VBO
     glVertexAttribPointer(1,
                           3, // RGB colors
@@ -228,7 +245,7 @@ void meshCreate(Mesh3D *mesh)
                           (GLvoid *)(sizeof(GLfloat) * 3)
                           );
 
-    glEnableVertexAttribArray(1);
+    //glEnableVertexAttribArray(1);
 
     // unbind our currently bound vertex array object
     glBindVertexArray(0);
@@ -331,7 +348,7 @@ void meshDraw(Mesh3D *mesh)
     // we drawing using indices
     // Render data
     // 6 indices will draw us the triangle, paramter 2 in this fn()
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
                     
     
     // stop using our current graphics pipeline
@@ -584,8 +601,14 @@ void mainLoop()
         input();
 
         // disable depth test and face culling
-        glDisable(GL_DEPTH_TEST);
-        glDisable(GL_CULL_FACE);
+        //glDisable(GL_DEPTH_TEST);
+        //glDisable(GL_CULL_FACE);
+        
+
+        // here we enable face culling for the cube
+        glEnable(GL_CULL_FACE);
+        glFrontFace(GL_CW);
+        glCullFace(GL_BACK);
 
         // initialize clear color
         // this is the background of the screen.
@@ -594,8 +617,9 @@ void mainLoop()
 
         // clear color buffer and depth buffer
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-        
-        static float rotate = 0.05f;
+       
+        static float rotate = 0.0f;
+        //static float rotate = 0.05f;
         meshRotate(&gMesh1, rotate, glm::vec3(0.0f, 1.0f, 0.0f));
         meshRotate(&gMesh2, -rotate, glm::vec3(0.0f, 1.0f, 0.0f));
 
@@ -655,7 +679,7 @@ int main(int argc, char *argv[])
 
     meshCreate(&gMesh2);
     meshTranslate(&gMesh2, 0.0f, 0.0f, -4.0f);
-    meshScale(&gMesh2, 1.0f, 2.0f, 1.0f);
+    meshScale(&gMesh2, 1.0f, 1.0f, 1.0f);
 
     // 3. create our graphics pipeline,
     //    at a minimum this means create the
