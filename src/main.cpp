@@ -150,6 +150,7 @@ void meshCreate(Mesh3D *mesh)
     //       which follow in this function. It is not necessary, but it makes
     //       the code cleaner if GPU-related functions are packed closer
     //       together versus CPU operations.
+    /* Test run edit with a different branch.
     const std::vector<GLfloat> vertexData{
         // 0 - vertex
        -0.5f, -0.5f, 0.0f, // left vertex position
@@ -165,7 +166,7 @@ void meshCreate(Mesh3D *mesh)
         0.0f, 0.0f, 1.0f, // right vertex color
 
    };
-
+*/
     // Vertex Arrays Object (VAO) setup
     // note: we can think of the VAO as a 'wrapper around' all of the Vertex
     // buffer obects; In the sense that it encapsulates all VBO state that we
