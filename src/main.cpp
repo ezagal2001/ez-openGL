@@ -143,28 +143,35 @@ void meshCreate(Mesh3D *mesh)
     // Geometry Data
     // Here we are going to store x,y,z postion attributes within
     // vertexPositions. For now this information is just stored in the CPU, and
-    // we are going to store this data on the GPU shortly, in a call to
-    // glBufferData(); Which will store this inforamtion into a vertex buffer
     // object.
     // Note: That I have segregated the data from the OpenGL calls which follow
     //       which follow in this function. It is not necessary, but it makes
     //       the code cleaner if GPU-related functions are packed closer
     //       together versus CPU operations.
     const std::vector<GLfloat> vertexData{
+        // red triangle
         // 0 - vertex
-       -0.5f, -0.5f, 0.0f, // left vertex position
-       1.0f, 0.0f, 0.0f, // left vertex color
+       -0.5f, -0.5f, 0.0f, // bottom-left vertex position
+       1.0f, 0.0f, 0.0f, // bottom-left vertex color
        // 1 - vertex
-        0.5f, -0.5f, 0.0f, // right vertex position
-        0.0f, 1.0f, 0.0f, // right vertex color
+        0.0f, 0.5f, 0.0f, // bottom-right vertex position
+        1.0f, 0.0f, 0.0f, // bottom-right vertex color
         // 2 - vertex
-        -0.5f, 0.5, 0.0f,   // top vertex position
-        0.0f, 0.0f, 1.0f, // top vertex color
+        0.5f, -0.5, 0.0f,   // top-left vertex position
+        1.0f, 0.0f, 0.0f, // top-left vertex color
+                         
+        // blue triangle                  
         // 3 - vertex                   
-        0.5f, 0.5f, 0.0f, // top vertex position
-        0.0f, 0.0f, 1.0f, // right vertex color
-
+        -0.5f, 0.5f, 0.0f, // top-right vertex position
+        0.0f, 0.0f, 1.0f, // top-right vertex color
+        // 4 - vertex
+        0.0f, -0.5f, 0.0f, // top-right vertex position
+        0.0f, 0.0f, 1.0f, // top-right vertex color
+        // 5 - vertex
+        0.5f, 0.5f, 0.0f, // top-right vertex position
+        0.0f, 0.0f, 1.0f, // top-right vertex color
    };
+
     // Vertex Arrays Object (VAO) setup
     // note: we can think of the VAO as a 'wrapper around' all of the Vertex
     // buffer obects; In the sense that it encapsulates all VBO state that we
@@ -196,7 +203,7 @@ void meshCreate(Mesh3D *mesh)
                 GL_STATIC_DRAW); // how we intend to use the data
             
 
-    const std::vector<GLuint> indexBufferData{2, 0, 1, 3, 2, 1};
+    const std::vector<GLuint> indexBufferData{0, 1, 2, 3, 4, 5};
     // setup the index buffer
     glGenBuffers(1, &mesh->mIndexBufferObject);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,
@@ -326,8 +333,10 @@ void meshDraw(Mesh3D *mesh)
     // render data
     // changed it to 6 vertices, for our quad
     //glDrawArrays(GL_TRIANGLES, 0, 6);
-
-    // we drawing using indices
+    
+    // clear the depth buffer, already done in the input()
+    //glClear(GL_DEPTH_BUFFER_BIT);
+    // we draw using indices
     // Render data
     // 6 indices will draw us the triangle, paramter 2 in this fn()
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -582,9 +591,11 @@ void mainLoop()
         // handle input
         input();
 
+    // I enabled the depth test.
         // disable depth test and face culling
-        glDisable(GL_DEPTH_TEST);
-        glDisable(GL_CULL_FACE);
+     //   glDisable(GL_DEPTH_TEST);
+        glEnable(GL_DEPTH_TEST);
+        //glDisable(GL_CULL_FACE);
 
         // initialize clear color
         // this is the background of the screen.
@@ -594,9 +605,9 @@ void mainLoop()
         // clear color buffer and depth buffer
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
         
-        static float rotate = 0.05f;
+        static float rotate = 0.0f;
         meshRotate(&gMesh1, rotate, glm::vec3(0.0f, 1.0f, 0.0f));
-        meshRotate(&gMesh2, -rotate, glm::vec3(0.0f, 1.0f, 0.0f));
+//        meshRotate(&gMesh2, -rotate, glm::vec3(0.0f, 1.0f, 0.0f));
 
         // update our meshes before drawing
 
@@ -652,9 +663,9 @@ int main(int argc, char *argv[])
     meshTranslate(&gMesh1, 0.0f, 0.0f, -2.0f);
     meshScale(&gMesh1, 1.0f, 1.0f, 1.0f);
 
-    meshCreate(&gMesh2);
-    meshTranslate(&gMesh2, 0.0f, 0.0f, -4.0f);
-    meshScale(&gMesh2, 1.0f, 2.0f, 1.0f);
+ //   meshCreate(&gMesh2);
+  //  meshTranslate(&gMesh2, 0.0f, 0.0f, -4.0f);
+  //  meshScale(&gMesh2, 1.0f, 2.0f, 1.0f);
 
     // 3. create our graphics pipeline,
     //    at a minimum this means create the
@@ -664,7 +675,7 @@ int main(int argc, char *argv[])
 
     // 3.5 for each of our meshes, set them to a pipeline
     meshSetPipeline(&gMesh1, gApp.mGraphicsPipeLineShaderProgram);
-    meshSetPipeline(&gMesh2, gApp.mGraphicsPipeLineShaderProgram);
+//    meshSetPipeline(&gMesh2, gApp.mGraphicsPipeLineShaderProgram);
 
     // 4. call the main application loop
     mainLoop();
