@@ -5,7 +5,8 @@
 #include <SDL2/SDL.h>
 #include <glad/glad.h>
 #include <glm/glm.hpp>
-#include <glm/vec3.hpp>
+// included in the Primitives.hpp header file
+//#include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -17,6 +18,8 @@
 
 // our libraries
 #include <Camera.hpp>
+#include <ezVertex.hpp>
+#include <ShapeGenerator.hpp>
 
 #define EZ_W_NAME	"ez-project"
 
@@ -148,6 +151,7 @@ void meshCreate(Mesh3D *mesh)
     //       which follow in this function. It is not necessary, but it makes
     //       the code cleaner if GPU-related functions are packed closer
     //       together versus CPU operations.
+    /*
     const std::vector<GLfloat> vertexData{
         // red triangle
         // 0 - vertex
@@ -171,6 +175,27 @@ void meshCreate(Mesh3D *mesh)
         0.5f, 0.5f, 0.0f, // top-right vertex position
         0.0f, 0.0f, 1.0f, // top-right vertex color
    };
+   */
+  /* 
+    struct ezVertex {
+        glm::vec3 position;
+        glm::vec3 color;
+    };
+    */
+
+    ezVertex vertexData[] =
+    {
+        glm::vec3(0.0f, 1.0f, 0.0f),
+        glm::vec3(1.0f, 0.0f, 0.0f),
+
+        glm::vec3(-1.0f, -1.0f, 0.0f),
+        glm::vec3(0.0f, 1.0f, 0.0f),
+
+        glm::vec3(1.0f, -1.0f, 0.0f),
+        glm::vec3(0.0f, 0.0f, 1.0f)
+    };
+             
+    ShapeData tri = ShapeGenerator::makeTriangle();
 
     // Vertex Arrays Object (VAO) setup
     // note: we can think of the VAO as a 'wrapper around' all of the Vertex
@@ -198,20 +223,20 @@ void meshCreate(Mesh3D *mesh)
     // now, in our curretly binded buffer, we populate the data from our 'vertexPositions'
     // (which lives on the CPU), onto a buffer that will live on the GPU
     glBufferData(GL_ARRAY_BUFFER, // kind of buffer we are working with 
-                vertexData.size() * sizeof(GLfloat), // size of data in bytes
-                vertexData.data(), // raw array of data
+                tri.vertexBufferSize(), // size of data in bytes
+                &tri.vertices, // raw array of data
                 GL_STATIC_DRAW); // how we intend to use the data
             
 
-    const std::vector<GLuint> indexBufferData{0, 1, 2, 3, 4, 5};
+    //const std::vector<GLuint> indexBufferData{0, 1, 2, 3, 4, 5};
     // setup the index buffer
     glGenBuffers(1, &mesh->mIndexBufferObject);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,
                 mesh->mIndexBufferObject);
     // populate our index buffer
     glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-                indexBufferData.size() * sizeof(GLuint),
-                indexBufferData.data(),
+                tri.indexBufferSize(),
+                &tri.indices,
                 GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
@@ -221,7 +246,7 @@ void meshCreate(Mesh3D *mesh)
                           3,    // the number of components
                           GL_FLOAT, // type
                           false, // is the data normalized
-                          sizeof(GLfloat) * 6, // stride
+                          sizeof(float) * 6, // stride
                           (void *)0 // offset, in reference to the start of the vector
                           ); 
            
@@ -230,7 +255,7 @@ void meshCreate(Mesh3D *mesh)
                           3, // RGB colors
                           GL_FLOAT,
                           false,
-                          sizeof(GLfloat) * 6,
+                          sizeof(float) * 6,
                           (GLvoid *)(sizeof(GLfloat) * 3)
                           );
 
