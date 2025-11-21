@@ -1,4 +1,6 @@
-obj/main.o: main.cpp ../include/glad/glad.h ../include/KHR/khrplatform.h \
+obj/ShapeGenerator.o: ShapeGenerator.cpp ../include/ShapeGenerator.hpp \
+ ../include/ShapeData.hpp ../include/glad/glad.h \
+ ../include/KHR/khrplatform.h \
  ../../common/third-party/glm-master/glm/glm.hpp \
  ../../common/third-party/glm-master/glm/detail/_fixes.hpp \
  ../../common/third-party/glm-master/glm/detail/setup.hpp \
@@ -9,7 +11,6 @@ obj/main.o: main.cpp ../include/glad/glad.h ../include/KHR/khrplatform.h \
  ../../common/third-party/glm-master/glm/vec2.hpp \
  ../../common/third-party/glm-master/glm/./ext/vector_bool2.hpp \
  ../../common/third-party/glm-master/glm/./ext/../detail/type_vec2.hpp \
- ../../common/third-party/glm-master/glm/./ext/../detail/_swizzle_func.hpp \
  ../../common/third-party/glm-master/glm/./ext/../detail/type_vec2.inl \
  ../../common/third-party/glm-master/glm/./ext/../detail/./compute_vector_relational.hpp \
  ../../common/third-party/glm-master/glm/./ext/../detail/./setup.hpp \
@@ -142,21 +143,9 @@ obj/main.o: main.cpp ../include/glad/glad.h ../include/KHR/khrplatform.h \
  ../../common/third-party/glm-master/glm/detail/type_half.inl \
  ../../common/third-party/glm-master/glm/integer.hpp \
  ../../common/third-party/glm-master/glm/detail/func_integer.inl \
- ../../common/third-party/glm-master/glm/gtc/matrix_transform.hpp \
- ../../common/third-party/glm-master/glm/gtc/../ext/matrix_projection.hpp \
- ../../common/third-party/glm-master/glm/gtc/../ext/../gtc/constants.hpp \
- ../../common/third-party/glm-master/glm/gtc/../ext/../gtc/../ext/scalar_constants.hpp \
- ../../common/third-party/glm-master/glm/gtc/../ext/../gtc/../ext/../detail/setup.hpp \
- ../../common/third-party/glm-master/glm/gtc/../ext/../gtc/../ext/scalar_constants.inl \
- ../../common/third-party/glm-master/glm/gtc/../ext/../gtc/constants.inl \
- ../../common/third-party/glm-master/glm/gtc/../ext/matrix_projection.inl \
- ../../common/third-party/glm-master/glm/gtc/../ext/matrix_clip_space.hpp \
- ../../common/third-party/glm-master/glm/gtc/../ext/matrix_clip_space.inl \
- ../../common/third-party/glm-master/glm/gtc/../ext/matrix_transform.hpp \
- ../../common/third-party/glm-master/glm/gtc/../ext/matrix_transform.inl \
- ../../common/third-party/glm-master/glm/gtc/matrix_transform.inl \
- ../include/Camera.hpp ../include/ezVertex.hpp \
- ../include/ShapeGenerator.hpp ../include/ShapeData.hpp
+ ../include/ezVertex.hpp
+../include/ShapeGenerator.hpp:
+../include/ShapeData.hpp:
 ../include/glad/glad.h:
 ../include/KHR/khrplatform.h:
 ../../common/third-party/glm-master/glm/glm.hpp:
@@ -169,7 +158,6 @@ obj/main.o: main.cpp ../include/glad/glad.h ../include/KHR/khrplatform.h \
 ../../common/third-party/glm-master/glm/vec2.hpp:
 ../../common/third-party/glm-master/glm/./ext/vector_bool2.hpp:
 ../../common/third-party/glm-master/glm/./ext/../detail/type_vec2.hpp:
-../../common/third-party/glm-master/glm/./ext/../detail/_swizzle_func.hpp:
 ../../common/third-party/glm-master/glm/./ext/../detail/type_vec2.inl:
 ../../common/third-party/glm-master/glm/./ext/../detail/./compute_vector_relational.hpp:
 ../../common/third-party/glm-master/glm/./ext/../detail/./setup.hpp:
@@ -302,20 +290,4 @@ obj/main.o: main.cpp ../include/glad/glad.h ../include/KHR/khrplatform.h \
 ../../common/third-party/glm-master/glm/detail/type_half.inl:
 ../../common/third-party/glm-master/glm/integer.hpp:
 ../../common/third-party/glm-master/glm/detail/func_integer.inl:
-../../common/third-party/glm-master/glm/gtc/matrix_transform.hpp:
-../../common/third-party/glm-master/glm/gtc/../ext/matrix_projection.hpp:
-../../common/third-party/glm-master/glm/gtc/../ext/../gtc/constants.hpp:
-../../common/third-party/glm-master/glm/gtc/../ext/../gtc/../ext/scalar_constants.hpp:
-../../common/third-party/glm-master/glm/gtc/../ext/../gtc/../ext/../detail/setup.hpp:
-../../common/third-party/glm-master/glm/gtc/../ext/../gtc/../ext/scalar_constants.inl:
-../../common/third-party/glm-master/glm/gtc/../ext/../gtc/constants.inl:
-../../common/third-party/glm-master/glm/gtc/../ext/matrix_projection.inl:
-../../common/third-party/glm-master/glm/gtc/../ext/matrix_clip_space.hpp:
-../../common/third-party/glm-master/glm/gtc/../ext/matrix_clip_space.inl:
-../../common/third-party/glm-master/glm/gtc/../ext/matrix_transform.hpp:
-../../common/third-party/glm-master/glm/gtc/../ext/matrix_transform.inl:
-../../common/third-party/glm-master/glm/gtc/matrix_transform.inl:
-../include/Camera.hpp:
 ../include/ezVertex.hpp:
-../include/ShapeGenerator.hpp:
-../include/ShapeData.hpp:

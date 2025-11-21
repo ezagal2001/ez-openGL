@@ -77,7 +77,7 @@ struct Mesh3D {
 // Globals
 App gApp;
 Mesh3D gMesh1;
-Mesh3D gMesh2;
+//Mesh3D gMesh2;
 
 // print some info
 void getOpenGLVersionInfo()
@@ -182,7 +182,7 @@ void meshCreate(Mesh3D *mesh)
         glm::vec3 color;
     };
     */
-
+/*
     ezVertex vertexData[] =
     {
         glm::vec3(0.0f, 1.0f, 0.0f),
@@ -194,7 +194,7 @@ void meshCreate(Mesh3D *mesh)
         glm::vec3(1.0f, -1.0f, 0.0f),
         glm::vec3(0.0f, 0.0f, 1.0f)
     };
-             
+ */            
     ShapeData tri = ShapeGenerator::makeTriangle();
 
     // Vertex Arrays Object (VAO) setup
@@ -224,7 +224,7 @@ void meshCreate(Mesh3D *mesh)
     // (which lives on the CPU), onto a buffer that will live on the GPU
     glBufferData(GL_ARRAY_BUFFER, // kind of buffer we are working with 
                 tri.vertexBufferSize(), // size of data in bytes
-                &tri.vertices, // raw array of data
+                tri.vertices, // raw array of data
                 GL_STATIC_DRAW); // how we intend to use the data
             
 
@@ -236,7 +236,7 @@ void meshCreate(Mesh3D *mesh)
     // populate our index buffer
     glBufferData(GL_ELEMENT_ARRAY_BUFFER,
                 tri.indexBufferSize(),
-                &tri.indices,
+                tri.indices,
                 GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
@@ -363,8 +363,8 @@ void meshDraw(Mesh3D *mesh)
     //glClear(GL_DEPTH_BUFFER_BIT);
     // we draw using indices
     // Render data
-    // 6 indices will draw us the triangle, paramter 2 in this fn()
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    // 3 indices will draw us the triangle, paramter 2 in this fn()
+    glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
                     
     
     // stop using our current graphics pipeline
