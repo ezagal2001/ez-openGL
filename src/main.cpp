@@ -267,7 +267,9 @@ void meshCreate(Mesh3D *mesh)
     // array, we don't want to leave them open.
     glDisableVertexAttribArray(0); // the literal is a reference to an index?
     glDisableVertexAttribArray(1);
-
+    
+    // delete the memory allocated for the triangle
+    tri.cleanup();
 }
 
 void meshDelete(Mesh3D *mesh)
@@ -345,6 +347,17 @@ void meshDraw(Mesh3D *mesh)
                                         "u_Projection");
     glUniformMatrix4fv(u_ProjectionLocation, 1, false, &perspective[0][0]);
     
+    // lets add some color via uniform
+    glm::vec3 dominatingColor(1.0f, 0.0f, 0.0f);
+    // lets find the location of the color uniform
+    GLint u_dominatingColor = findUniformLocation(gApp.mGraphicsPipeLineShaderProgram,
+                                        "dominatingColor");
+    // send it!
+    // not sure how the address symbol is setting the index?
+    // I think its how the vec3 is implemented, it overloads the 
+    // index operator.
+    glUniform3fv(u_dominatingColor, 1, &dominatingColor[0]);
+
     // enable our attributes
     glBindVertexArray(mesh->mVertexArrayObject);
 
