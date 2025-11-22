@@ -89,7 +89,7 @@ ShapeData ShapeGenerator::makeCube()
         glm::vec3(-1.0f, -1.0f, 1.0f), // 22
         glm::vec3(0.5f, 0.8f, 0.5f), // color
         glm::vec3(1.0f, -1.0f, 1.0f), // 23
-        glm::vec3(0.9f, 1.0f, 0.2f), // color
+        glm::vec3(0.9f, 1.0f, 0.2f) // color
 
     };
 
@@ -100,7 +100,7 @@ ShapeData ShapeGenerator::makeCube()
         unsigned short stackIndices[] = 
         {
             0, 1, 2, 0, 2, 3, // top
-            4, 5, 6, 4, 6, 6, // front
+            4, 5, 6, 4, 6, 7, // front
             8, 9, 10, 8, 10, 11, // right
             12, 13, 14, 12, 14, 15, // left
             16, 17, 18, 16, 18, 19, // back

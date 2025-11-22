@@ -593,7 +593,7 @@ void mainLoop()
         // clear color buffer and depth buffer
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
         
-        static float rotate = 0.0f;
+        static float rotate = 0.05f;
         meshRotate(&gMesh1, rotate, glm::vec3(0.0f, 1.0f, 0.0f));
 //        meshRotate(&gMesh2, -rotate, glm::vec3(0.0f, 1.0f, 0.0f));
 
