@@ -594,7 +594,7 @@ void mainLoop()
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
         
         static float rotate = 0.05f;
-        meshRotate(&gMesh1, rotate, glm::vec3(0.0f, 1.0f, 0.0f));
+        meshRotate(&gMesh1, rotate, glm::vec3(1.0f, 0.0f, 0.0f));
 //        meshRotate(&gMesh2, -rotate, glm::vec3(0.0f, 1.0f, 0.0f));
 
         // update our meshes before drawing
@@ -648,7 +648,7 @@ int main(int argc, char *argv[])
     // 2. set up our geometry, this set up is on a per object basis,
     //    these entities live on the GPU?
     meshCreate(&gMesh1);
-    meshTranslate(&gMesh1, 0.0f, 0.0f, -2.0f);
+    meshTranslate(&gMesh1, 0.0f, 0.0f, -3.0f);
     meshScale(&gMesh1, 1.0f, 1.0f, 1.0f);
 
  //   meshCreate(&gMesh2);
