@@ -8,6 +8,7 @@ uniform mat4 u_ModelMatrix;
 uniform mat4 u_Projection; 
 uniform mat4 u_ViewMatrix;
 
+uniform vec3 dominatingColor;
 out vec3 v_vertexColors;
 
 void main()

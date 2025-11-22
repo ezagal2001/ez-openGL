@@ -1,12 +1,11 @@
 // This program is the second program working with OpenGL.
+// We use Jamie King's 3D graphics tutorial series for the updates.
 
 #define GLM_FORCE_SWIZZLE
 // Third party libraries
 #include <SDL2/SDL.h>
 #include <glad/glad.h>
 #include <glm/glm.hpp>
-// included in the Primitives.hpp header file
-//#include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -35,7 +34,7 @@ struct App {
 
     // Shader
     // The following stores a unique id for the graphics pipeline
-    // program object that will used for our OpenGL draw calls.
+    // program object that will be used for our OpenGL draw calls.
     GLuint mGraphicsPipeLineShaderProgram = 0;
 
     Camera mCamera;
@@ -65,10 +64,8 @@ struct Mesh3D {
     // when we do indexed drawing.
     GLuint mIndexBufferObject = 0;
 
-    // Shaders
     // This is the graphics pipeline we will use
     GLuint mPipeline = 0;
-    // Here we setup two shaders, a vertex shader and a fragment shader.
     // At a minimum, every Modern OpenGL program needs a vertex and a
     // fragment shader.
     Transform mTransform;
@@ -77,6 +74,7 @@ struct Mesh3D {
 // Globals
 App gApp;
 Mesh3D gMesh1;
+GLuint gNumIndices;
 //Mesh3D gMesh2;
 
 // print some info
@@ -115,7 +113,8 @@ void initializeProgram(App *app)
                                       SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
     // error checking 
 	if (app->mGraphicsApplicationWindow == nullptr) {
-		std::cout << "The SDL_CreateWindow() API failed, exiting now..." << SDL_GetError()  << std::endl;
+		std::cout << "The SDL_CreateWindow() API failed, exiting now..." 
+                << SDL_GetError()  << std::endl;
         exit(1);
 	}
 
@@ -143,60 +142,9 @@ void initializeProgram(App *app)
 // Setup which shader pipeline you'll use with your mesh
 void meshCreate(Mesh3D *mesh)
 {
-    // Geometry Data
-    // Here we are going to store x,y,z postion attributes within
-    // vertexPositions. For now this information is just stored in the CPU, and
-    // object.
-    // Note: That I have segregated the data from the OpenGL calls which follow
-    //       which follow in this function. It is not necessary, but it makes
-    //       the code cleaner if GPU-related functions are packed closer
-    //       together versus CPU operations.
-    /*
-    const std::vector<GLfloat> vertexData{
-        // red triangle
-        // 0 - vertex
-       -0.5f, -0.5f, 0.0f, // bottom-left vertex position
-       1.0f, 0.0f, 0.0f, // bottom-left vertex color
-       // 1 - vertex
-        0.0f, 0.5f, 0.0f, // bottom-right vertex position
-        1.0f, 0.0f, 0.0f, // bottom-right vertex color
-        // 2 - vertex
-        0.5f, -0.5, 0.0f,   // top-left vertex position
-        1.0f, 0.0f, 0.0f, // top-left vertex color
-                         
-        // blue triangle                  
-        // 3 - vertex                   
-        -0.5f, 0.5f, 0.0f, // top-right vertex position
-        0.0f, 0.0f, 1.0f, // top-right vertex color
-        // 4 - vertex
-        0.0f, -0.5f, 0.0f, // top-right vertex position
-        0.0f, 0.0f, 1.0f, // top-right vertex color
-        // 5 - vertex
-        0.5f, 0.5f, 0.0f, // top-right vertex position
-        0.0f, 0.0f, 1.0f, // top-right vertex color
-   };
-   */
-  /* 
-    struct ezVertex {
-        glm::vec3 position;
-        glm::vec3 color;
-    };
-    */
-/*
-    ezVertex vertexData[] =
-    {
-        glm::vec3(0.0f, 1.0f, 0.0f),
-        glm::vec3(1.0f, 0.0f, 0.0f),
 
-        glm::vec3(-1.0f, -1.0f, 0.0f),
-        glm::vec3(0.0f, 1.0f, 0.0f),
-
-        glm::vec3(1.0f, -1.0f, 0.0f),
-        glm::vec3(0.0f, 0.0f, 1.0f)
-    };
- */            
-    ShapeData tri = ShapeGenerator::makeTriangle();
-
+    //ShapeData shape = ShapeGenerator::makeTriangle();
+    ShapeData shape = ShapeGenerator::makeCube();
     // Vertex Arrays Object (VAO) setup
     // note: we can think of the VAO as a 'wrapper around' all of the Vertex
     // buffer obects; In the sense that it encapsulates all VBO state that we
@@ -223,20 +171,17 @@ void meshCreate(Mesh3D *mesh)
     // now, in our curretly binded buffer, we populate the data from our 'vertexPositions'
     // (which lives on the CPU), onto a buffer that will live on the GPU
     glBufferData(GL_ARRAY_BUFFER, // kind of buffer we are working with 
-                tri.vertexBufferSize(), // size of data in bytes
-                tri.vertices, // raw array of data
+                shape.vertexBufferSize(), // size of data in bytes
+                shape.vertices, // raw array of data
                 GL_STATIC_DRAW); // how we intend to use the data
             
-
-    //const std::vector<GLuint> indexBufferData{0, 1, 2, 3, 4, 5};
-    // setup the index buffer
     glGenBuffers(1, &mesh->mIndexBufferObject);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,
                 mesh->mIndexBufferObject);
     // populate our index buffer
     glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-                tri.indexBufferSize(),
-                tri.indices,
+                shape.indexBufferSize(),
+                shape.indices,
                 GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
@@ -268,8 +213,10 @@ void meshCreate(Mesh3D *mesh)
     glDisableVertexAttribArray(0); // the literal is a reference to an index?
     glDisableVertexAttribArray(1);
     
+    // get the number of indices for the shape
+    gNumIndices = shape.numIndices;
     // delete the memory allocated for the triangle
-    tri.cleanup();
+    shape.cleanup();
 }
 
 void meshDelete(Mesh3D *mesh)
@@ -278,7 +225,7 @@ void meshDelete(Mesh3D *mesh)
     glDeleteVertexArrays(1, &mesh->mVertexArrayObject);
 }
 
-// needs to set the graphics pipeline before we draw
+// need to set the graphics pipeline before we draw
 void meshSetPipeline(Mesh3D *mesh, GLuint pipeline)
 {
     mesh->mPipeline = pipeline;
@@ -312,15 +259,12 @@ int findUniformLocation(GLuint pipeline, const GLchar *name)
 // Typically this includes 'glDraw' related calls, and the relevant setup
 // of buffers for thos calls.
 //
-// Note: We per mesh, choose the graphics pipeline that we want to use,
+// Note: We draw per mesh, choose the graphics pipeline that we want to use,
 //       generally not very efficient, update later.
 void meshDraw(Mesh3D *mesh)
 {
-    // we wrapped some of the function calls with the macro
-    // we defined.
     if (mesh == nullptr) {
         exit(1);
-      //  return 1;
     }
     
     // setup which graphics pipeline we are going to use
@@ -328,16 +272,21 @@ void meshDraw(Mesh3D *mesh)
 
     // get the location of the uniform variables we are using for this
     // program.
-    //
+    
     // model-matrix-related uniform
     GLint u_ModelMatrixLocation = findUniformLocation(gApp.mGraphicsPipeLineShaderProgram,
                                         "u_ModelMatrix");
-    glUniformMatrix4fv(u_ModelMatrixLocation, 1, false, &mesh->mTransform.mModelMatrix[0][0]);
+    // send it!
+    // The 1 is because we are currently using 1 matrix.
+    // The false is the predicate for the matrix-transpose operation.
+    glUniformMatrix4fv(u_ModelMatrixLocation, 1, false, 
+                        &mesh->mTransform.mModelMatrix[0][0]);
 
     // view-matrix-related uniform
     glm::mat4 view = gApp.mCamera.GetViewMatrix();
     GLint u_ViewLocation = findUniformLocation(gApp.mGraphicsPipeLineShaderProgram,
                                         "u_ViewMatrix");
+    // send it!
     glUniformMatrix4fv(u_ViewLocation, 1, false, &view[0][0]);
 
     // projection-matrix-related uniform
@@ -345,18 +294,18 @@ void meshDraw(Mesh3D *mesh)
 
     GLint u_ProjectionLocation = findUniformLocation(gApp.mGraphicsPipeLineShaderProgram,
                                         "u_Projection");
+    // send it!
     glUniformMatrix4fv(u_ProjectionLocation, 1, false, &perspective[0][0]);
     
     // lets add some color via uniform
-    glm::vec3 dominatingColor(1.0f, 0.0f, 0.0f);
+    //glm::vec3 dominatingColor(1.0f, 0.0f, 0.0f);
     // lets find the location of the color uniform
-    GLint u_dominatingColor = findUniformLocation(gApp.mGraphicsPipeLineShaderProgram,
-                                        "dominatingColor");
+   // GLint u_dominatingColor = findUniformLocation(gApp.mGraphicsPipeLineShaderProgram,
+    //                                    "dominatingColor");
     // send it!
-    // not sure how the address symbol is setting the index?
     // I think its how the vec3 is implemented, it overloads the 
     // index operator.
-    glUniform3fv(u_dominatingColor, 1, &dominatingColor[0]);
+    //glUniform3fv(u_dominatingColor, 1, &dominatingColor[0]);
 
     // enable our attributes
     glBindVertexArray(mesh->mVertexArrayObject);
@@ -377,7 +326,7 @@ void meshDraw(Mesh3D *mesh)
     // we draw using indices
     // Render data
     // 3 indices will draw us the triangle, paramter 2 in this fn()
-    glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
+    glDrawElements(GL_TRIANGLES, gNumIndices, GL_UNSIGNED_SHORT, 0);
                     
     
     // stop using our current graphics pipeline
@@ -579,6 +528,7 @@ void input()
                     << std::endl;
             gApp.mQuit = true;
         } 
+
         if (e.type == SDL_MOUSEMOTION) {
             mouseX += e.motion.xrel;
             mouseY += e.motion.yrel;
@@ -592,7 +542,7 @@ void input()
 
     const Uint8 *state = SDL_GetKeyboardState(NULL);
 
-    float speed = 0.005f;
+    float speed = 0.003f;
     if (state[SDL_SCANCODE_UP]) {
         gApp.mCamera.MoveForward(speed);
     }
