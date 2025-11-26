@@ -5,13 +5,12 @@
 #include <Camera.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/rotate_vector.hpp>
-
-
 #include <iostream>
 
 // Default constructor
 Camera::Camera()
 {
+    // mEye represents the camera's position,
     // assume, we are placed at the origin
     mEye = glm::vec3(0.0f, 0.0f, 0.0f);
 
@@ -36,6 +35,7 @@ glm::mat4 Camera::getProjectionMatrix() const
 
 glm::mat4 Camera::GetViewMatrix() const 
 {   
+    // remember the mEye represents the camera's position
     return glm::lookAt(mEye, mEye + mViewDirection, mUpVector); 
 }
 
@@ -48,16 +48,28 @@ void Camera::MouseLook(int mouseX, int mouseY)
         mOldMousePosition = currentMouse;
         firstLook = false;
     }
-
-    glm::vec2 mouseDelta = mOldMousePosition - currentMouse;
-    mViewDirection = glm::rotate(mViewDirection, glm::radians(mouseDelta.x), mUpVector);
-
+    
+    float aFactor = 0.6;
+    glm::vec3 upDown = glm::cross(mViewDirection, mUpVector);
+    //glm::vec2 mouseDelta = mOldMousePosition - currentMouse;
+    glm::vec2 mouseDelta = currentMouse - mOldMousePosition;
+    mViewDirection = glm::rotate(mViewDirection, -aFactor * glm::radians(mouseDelta.x), mUpVector);
+    mViewDirection = glm::rotate(mViewDirection, -aFactor * glm::radians(mouseDelta.y), upDown);
     mOldMousePosition = currentMouse; 
+}
+
+void Camera::MoveUp(float speed)
+{
+    mEye += mUpVector * speed;
+}
+
+void Camera::MoveDown(float speed)
+{
+    mEye += -mUpVector * speed;
 }
 
 void Camera::MoveForward(float speed)
 {
-    // simple, not yet correct
     mEye += mViewDirection * speed;
 }
 
@@ -76,11 +88,7 @@ void Camera::MoveRight(float speed)
 {
     glm::vec3 rightVector = glm::cross(mViewDirection, mUpVector);
     mEye += rightVector * speed;
-    
 }
-
-
-
 
 
 

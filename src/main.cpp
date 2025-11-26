@@ -75,7 +75,7 @@ struct Mesh3D {
 App gApp;
 Mesh3D gMesh1;
 GLuint gNumIndices;
-//Mesh3D gMesh2;
+Mesh3D gMesh2;
 
 // print some info
 void getOpenGLVersionInfo()
@@ -334,12 +334,13 @@ void meshDraw(Mesh3D *mesh)
     glUseProgram(0);
 }
 
-// Translates a mesh --- updating its model matrix
+// translates a mesh --- updating its model matrix
 void meshTranslate(Mesh3D *mesh, float x, float y, float z)
 {
 
     
-    // Create a "model-matrix, that begins with a translate-matrix?"
+    // update our model matrix with a translation, the 3-component vector
+    // is the translation we are doing. 
     mesh->mTransform.mModelMatrix = glm::translate(mesh->mTransform.mModelMatrix,
                                     glm::vec3(x,
                                               y, 
@@ -347,17 +348,19 @@ void meshTranslate(Mesh3D *mesh, float x, float y, float z)
 
 }
 
-// rotates a mesh about the axis parameter
+// rotates a mesh about the axis parameter, updating its model matrix
 void meshRotate(Mesh3D *mesh, float angle, glm::vec3 axis)
 {
+    // update our model matrix with a rotation
     mesh->mTransform.mModelMatrix = glm::rotate(mesh->mTransform.mModelMatrix,
                                             glm::radians(angle),
                                             axis);
 }
 
-// scales a mesh in a non-uniform way
+// scales a mesh, updating its model matrix 
 void meshScale(Mesh3D *mesh, float x, float y, float z) 
 {
+    // update our model matrix with a scaling factor
     mesh->mTransform.mModelMatrix = glm::scale(mesh->mTransform.mModelMatrix,
                                             glm::vec3(x, y, z));
 }
@@ -543,22 +546,30 @@ void input()
     const Uint8 *state = SDL_GetKeyboardState(NULL);
 
     float speed = 0.003f;
-    if (state[SDL_SCANCODE_UP]) {
+    if (state[SDL_SCANCODE_R]) {
+            gApp.mCamera.MoveUp(speed);
+    }
+
+    if (state[SDL_SCANCODE_F]) {
+            gApp.mCamera.MoveDown(speed);
+    }
+
+    if (state[SDL_SCANCODE_W]) {
         gApp.mCamera.MoveForward(speed);
     }
 
-    if (state[SDL_SCANCODE_DOWN]) {
+    if (state[SDL_SCANCODE_S]) {
         gApp.mCamera.MoveBackward(speed);
        //guOffset -= 0.01f;
         //std::cout << "guOffset: " << guOffset << std::endl;
     }
 
-    if (state[SDL_SCANCODE_LEFT]) {
+    if (state[SDL_SCANCODE_A]) {
         gApp.mCamera.MoveLeft(speed);
         
     }
 
-    if (state[SDL_SCANCODE_RIGHT]) {
+    if (state[SDL_SCANCODE_D]) {
         gApp.mCamera.MoveRight(speed);
     }
 
@@ -593,11 +604,15 @@ void mainLoop()
         // clear color buffer and depth buffer
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
         
-        static float rotate = 0.05f;
-        meshRotate(&gMesh1, rotate, glm::vec3(1.0f, 0.0f, 0.0f));
-//        meshRotate(&gMesh2, -rotate, glm::vec3(0.0f, 1.0f, 0.0f));
+        
+        static float angle = 0.0f;
+        // mTransform is our model matrix
+        // the gMesh1->mTransform was first hit with the translate 
+        // matrix, then the scale, and now with the rotate matrix.
+        // e.g. rotate * scale * translate * mTransform
+        meshRotate(&gMesh1, angle, glm::vec3(1.0f, 0.0f, 0.0f));
+        // meshRotate(&gMesh2, -rotate, glm::vec3(0.0f, 1.0f, 0.0f));
 
-        // update our meshes before drawing
 
         // Draw calls in OpenGL
         // When we draw in OpenGL, this activates the graphics pipeline,
@@ -607,8 +622,8 @@ void mainLoop()
         meshUpdate(&gMesh1);
         meshDraw(&gMesh1);
 
-     //   meshUpdate(&gMesh2);
-     //   meshDraw(&gMesh2);
+      //  meshUpdate(&gMesh2);
+      //  meshDraw(&gMesh2);
 
         // update the screen of our specified windnow
         SDL_GL_SwapWindow(gApp.mGraphicsApplicationWindow);
@@ -648,12 +663,15 @@ int main(int argc, char *argv[])
     // 2. set up our geometry, this set up is on a per object basis,
     //    these entities live on the GPU?
     meshCreate(&gMesh1);
-    meshTranslate(&gMesh1, 0.0f, 0.0f, -3.0f);
+    // start our mesh 3 units into the screen
+    meshTranslate(&gMesh1, 1.0f, 0.0f, -3.0f);
+    // uniform scaling, change later?
     meshScale(&gMesh1, 1.0f, 1.0f, 1.0f);
+    // rotate transform happens next in the mainLoop() 
 
- //   meshCreate(&gMesh2);
-  //  meshTranslate(&gMesh2, 0.0f, 0.0f, -4.0f);
-  //  meshScale(&gMesh2, 1.0f, 2.0f, 1.0f);
+    //meshCreate(&gMesh2);
+    //meshTranslate(&gMesh2, 5.0f, 0.0f, -2.0f);
+    //meshScale(&gMesh2, 1.0f, 1.0f, 1.0f);
 
     // 3. create our graphics pipeline,
     //    at a minimum this means create the
@@ -663,7 +681,7 @@ int main(int argc, char *argv[])
 
     // 3.5 for each of our meshes, set them to a pipeline
     meshSetPipeline(&gMesh1, gApp.mGraphicsPipeLineShaderProgram);
-//    meshSetPipeline(&gMesh2, gApp.mGraphicsPipeLineShaderProgram);
+    //meshSetPipeline(&gMesh2, gApp.mGraphicsPipeLineShaderProgram);
 
     // 4. call the main application loop
     mainLoop();

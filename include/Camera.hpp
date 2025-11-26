@@ -13,13 +13,13 @@ class Camera {
 
         glm::mat4 getProjectionMatrix() const;
 
-
         // The ultimate view matrix we will produce
         // and return.
         glm::mat4 GetViewMatrix() const;
 
-
         void MouseLook(int mouseX, int mouseY);
+        void MoveUp(float speed);
+        void MoveDown(float speed);
         void MoveForward(float speed);
         void MoveBackward(float speed);
         void MoveLeft(float speed);
@@ -27,11 +27,9 @@ class Camera {
 
     private:
         glm::mat4 mProjectionMatrix;
-
         glm::vec3 mEye;
         glm::vec3 mViewDirection;
         glm::vec3 mUpVector;
-
         glm::vec2 mOldMousePosition;
 
 };
