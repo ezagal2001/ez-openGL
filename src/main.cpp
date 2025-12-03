@@ -22,6 +22,9 @@
 
 #define EZ_W_NAME	"ez-project"
 
+// the enums for the different shapes
+enum MeshShape : char { Triangle, Cube, Arrow };
+
 // "m", is for member.
 struct App {
     int mScreenHeight = 480;
@@ -49,9 +52,12 @@ struct Mesh3D {
     // Vertex Array Objects encapsulate all of the items needed to render an object
     // For example, we may have mutliple vertex buffer objects (VBO) related
     // to rendering one object.
-    // THe VAO allows us to setup the OpenGL state to render that object using
+    // The VAO allows us to setup the OpenGL state to render that object using
     // the correct layout and correct buffers with one call after being setup.
     GLuint mVertexArrayObject = 0;    
+    
+    // The kind of shape this mesh is.(enum type)
+    MeshShape mShape;
 
     // Vertex Buffer Object (VBO)
     // Vertex Buffer Objects store information relating to vertices (e.g. positions,
@@ -142,9 +148,26 @@ void initializeProgram(App *app)
 // Setup which shader pipeline you'll use with your mesh
 void meshCreate(Mesh3D *mesh)
 {
+    ShapeData shape;
+    switch (mesh->mShape) {
+        case Triangle:
+        shape = ShapeGenerator::makeTriangle();
+        break;
+        case Cube:
+        shape = ShapeGenerator::makeCube();
+        break;
+        case Arrow: // have to implement it later.
+        //shape = ShapeGenerator::makeArrow();
+        break;
+        default:
+        break;
+    }
+
+        
 
     //ShapeData shape = ShapeGenerator::makeTriangle();
-    ShapeData shape = ShapeGenerator::makeCube();
+    //ShapeData shape = ShapeGenerator::makeCube();
+    
     // Vertex Arrays Object (VAO) setup
     // note: we can think of the VAO as a 'wrapper around' all of the Vertex
     // buffer obects; In the sense that it encapsulates all VBO state that we
@@ -184,8 +207,10 @@ void meshCreate(Mesh3D *mesh)
                 shape.indices,
                 GL_STATIC_DRAW);
 
-    glEnableVertexAttribArray(0);
-
+    //glEnableVertexAttribArray(0);
+    
+    // the attrib pointer points to where the data is going to be pulled from
+    // link up the vertex data
     // the 3 is for the x, y, z
     glVertexAttribPointer(0,
                           3,    // the number of components
@@ -194,6 +219,11 @@ void meshCreate(Mesh3D *mesh)
                           sizeof(float) * 6, // stride
                           (void *)0 // offset, in reference to the start of the vector
                           ); 
+
+    // enable this pulling of data, this state
+    // will be 'saved' so we can disable the attrib
+    // at the end of this function
+    glEnableVertexAttribArray(0);
            
     // now linking up the color attributes in our VBO
     glVertexAttribPointer(1,
@@ -308,6 +338,8 @@ void meshDraw(Mesh3D *mesh)
     //glUniform3fv(u_dominatingColor, 1, &dominatingColor[0]);
 
     // enable our attributes
+    // we pull from the appropriate data buffers
+    // we setup earlier! Via the vao!
     glBindVertexArray(mesh->mVertexArrayObject);
 
     // select the vertex buffer object we want to enabel
@@ -662,6 +694,8 @@ int main(int argc, char *argv[])
 
     // 2. set up our geometry, this set up is on a per object basis,
     //    these entities live on the GPU?
+    //    letes make the gMesh1 a triangle.
+    gMesh1.mShape = Cube;
     meshCreate(&gMesh1);
     // start our mesh 3 units into the screen
     meshTranslate(&gMesh1, 1.0f, 0.0f, -3.0f);
